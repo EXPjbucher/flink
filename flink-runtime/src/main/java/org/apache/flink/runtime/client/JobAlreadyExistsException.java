@@ -16,24 +16,18 @@
  * limitations under the License.
  */
 
-package org.apache.flink.optimizer.plan;
-
-import java.io.File;
-import java.io.IOException;
+package org.apache.flink.runtime.client;
 
 import org.apache.flink.api.common.JobID;
-import org.apache.flink.runtime.jobgraph.JobGraph;
 
 /**
- * Abstract class representing Flink Streaming plans
- * 
+ * This exception is thrown when a job is submitted by the JobClient and it already exists.
  */
-public abstract class StreamingPlan implements FlinkPlan {
+public class JobAlreadyExistsException extends JobExecutionException {
 
-	public abstract JobGraph getJobGraph(JobID id);
+  private static final long serialVersionUID = 2818087325120827525L;
 
-	public abstract String getStreamingPlanAsJSON();
-
-	public abstract void dumpStreamingPlanAsJSON(File file) throws IOException;
-
+  public JobAlreadyExistsException(JobID jobId, String message) {
+    super(jobId, message);
+  }
 }

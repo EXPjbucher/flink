@@ -18,6 +18,7 @@
 package org.apache.flink.streaming.runtime.operators;
 
 import org.apache.flink.api.common.ExecutionConfig;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.execution.Environment;
@@ -132,7 +133,7 @@ public class StreamOperatorChainingTest {
 				});
 
 		// be build our own StreamTask and OperatorChain
-		JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+		JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 
 		Assert.assertTrue(jobGraph.getVerticesSortedTopologicallyFromSources().size() == 2);
 
@@ -272,7 +273,7 @@ public class StreamOperatorChainingTest {
 				});
 
 		// be build our own StreamTask and OperatorChain
-		JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+		JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 
 		Assert.assertTrue(jobGraph.getVerticesSortedTopologicallyFromSources().size() == 2);
 

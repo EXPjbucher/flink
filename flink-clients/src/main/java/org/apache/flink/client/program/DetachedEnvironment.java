@@ -72,8 +72,8 @@ public class DetachedEnvironment extends ContextEnvironment {
 	/**
 	 * Finishes this Context Environment's execution by explicitly running the plan constructed.
 	 */
-	JobSubmissionResult finalizeExecute() throws ProgramInvocationException {
-		return client.run(detachedPlan, jarFilesToAttach, classpathsToAttach, userCodeClassLoader, savepointSettings);
+	JobSubmissionResult finalizeExecute(JobID jobId) throws ProgramInvocationException {
+		return client.run(detachedPlan, jarFilesToAttach, classpathsToAttach, userCodeClassLoader, savepointSettings, jobId);
 	}
 
 	public static final class DetachedJobExecutionResult extends JobExecutionResult {

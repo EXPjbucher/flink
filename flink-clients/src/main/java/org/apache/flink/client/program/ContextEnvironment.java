@@ -59,7 +59,7 @@ public class ContextEnvironment extends ExecutionEnvironment {
 		Plan p = createProgramPlan(jobName);
 		JobWithJars toRun = new JobWithJars(p, this.jarFilesToAttach, this.classpathsToAttach,
 				this.userCodeClassLoader);
-		this.lastJobExecutionResult = client.run(toRun, getParallelism(), savepointSettings).getJobExecutionResult();
+		this.lastJobExecutionResult = client.run(toRun, getParallelism(), savepointSettings, JobID.generate()).getJobExecutionResult();
 		return this.lastJobExecutionResult;
 	}
 

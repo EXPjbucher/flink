@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.flink.annotation.Public;
 import org.apache.flink.api.common.InvalidProgramException;
 import org.apache.flink.api.common.JobExecutionResult;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.client.program.ClusterClient;
 import org.apache.flink.client.program.JobWithJars;
@@ -211,7 +212,7 @@ public class RemoteStreamEnvironment extends StreamExecutionEnvironment {
 		}
 
 		try {
-			return client.run(streamGraph, jarFiles, globalClasspaths, usercodeClassLoader).getJobExecutionResult();
+			return client.run(streamGraph, jarFiles, globalClasspaths, usercodeClassLoader, JobID.generate()).getJobExecutionResult();
 		}
 		catch (ProgramInvocationException e) {
 			throw e;

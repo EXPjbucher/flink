@@ -18,6 +18,7 @@
 package org.apache.flink.test.streaming.runtime;
 
 import org.apache.flink.api.common.InvalidProgramException;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -231,7 +232,7 @@ public class IterateITCase extends StreamingMultipleProgramsTestBase {
 
 		StreamGraph graph = env.getStreamGraph();
 
-		JobGraph jg = graph.getJobGraph();
+		JobGraph jg = graph.getJobGraph(JobID.generate());
 
 		assertEquals(1, graph.getIterationSourceSinkPairs().size());
 
@@ -318,7 +319,7 @@ public class IterateITCase extends StreamingMultipleProgramsTestBase {
 
 		StreamGraph graph = env.getStreamGraph();
 
-		JobGraph jg = graph.getJobGraph();
+		JobGraph jg = graph.getJobGraph(JobID.generate());
 
 		assertEquals(1, graph.getIterationSourceSinkPairs().size());
 
@@ -622,7 +623,7 @@ public class IterateITCase extends StreamingMultipleProgramsTestBase {
 				}
 
 				env.enableCheckpointing(1, CheckpointingMode.EXACTLY_ONCE, true);
-				env.getStreamGraph().getJobGraph();
+				env.getStreamGraph().getJobGraph(JobID.generate());
 
 				break; // success
 			} catch (Throwable t) {

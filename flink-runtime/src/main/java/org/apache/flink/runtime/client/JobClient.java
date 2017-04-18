@@ -460,6 +460,10 @@ public class JobClient {
 						"JobSubmission failed: " + t.getMessage(), t);
 			}
 		}
+		else if (result instanceof JobManagerMessages.JobAlreadyExists) {
+			JobID respondedID =  ((JobManagerMessages.JobAlreadyExists) result).jobId();
+			throw new JobAlreadyExistsException(respondedID, "The Job " + respondedID.toString() + " already exists. Ignoring this submission.");
+		}
 		else {
 			throw new JobExecutionException(jobGraph.getJobID(), "Unexpected response from JobManager: " + result);
 		}

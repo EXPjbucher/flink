@@ -18,6 +18,7 @@
 
 package org.apache.flink.streaming.api;
 
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.runtime.jobgraph.JobGraph;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -41,7 +42,7 @@ public class RestartStrategyTest extends TestLogger {
 		env.fromElements(1).print();
 
 		StreamGraph graph = env.getStreamGraph();
-		JobGraph jobGraph = graph.getJobGraph();
+		JobGraph jobGraph = graph.getJobGraph(JobID.generate());
 
 		RestartStrategies.RestartStrategyConfiguration restartStrategy =
 			jobGraph.getSerializedExecutionConfig().deserializeValue(getClass().getClassLoader()).getRestartStrategy();
@@ -64,7 +65,7 @@ public class RestartStrategyTest extends TestLogger {
 		env.fromElements(1).print();
 
 		StreamGraph graph = env.getStreamGraph();
-		JobGraph jobGraph = graph.getJobGraph();
+		JobGraph jobGraph = graph.getJobGraph(JobID.generate());
 
 		RestartStrategies.RestartStrategyConfiguration restartStrategy =
 			jobGraph.getSerializedExecutionConfig().deserializeValue(getClass().getClassLoader()).getRestartStrategy();
@@ -87,7 +88,7 @@ public class RestartStrategyTest extends TestLogger {
 		env.fromElements(1).print();
 
 		StreamGraph graph = env.getStreamGraph();
-		JobGraph jobGraph = graph.getJobGraph();
+		JobGraph jobGraph = graph.getJobGraph(JobID.generate());
 
 		RestartStrategies.RestartStrategyConfiguration restartStrategy =
 			jobGraph.getSerializedExecutionConfig().deserializeValue(getClass().getClassLoader()).getRestartStrategy();

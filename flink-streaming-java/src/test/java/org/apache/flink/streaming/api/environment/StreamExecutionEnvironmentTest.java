@@ -18,6 +18,7 @@
 package org.apache.flink.streaming.api.environment;
 
 import org.apache.flink.api.common.ExecutionConfig;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -255,13 +256,13 @@ public class StreamExecutionEnvironmentTest {
 		Assert.assertEquals(1 << 15, operator.getParallelism());
 
 		// default value after generating
-		env.getStreamGraph().getJobGraph();
+		env.getStreamGraph().getJobGraph(JobID.generate());
 		Assert.assertEquals(-1, operator.getTransformation().getMaxParallelism());
 
 		// configured value after generating
 		env.setParallelism(21);
 		env.setMaxParallelism(42);
-		env.getStreamGraph().getJobGraph();
+		env.getStreamGraph().getJobGraph(JobID.generate());
 		Assert.assertEquals(42, operator.getTransformation().getMaxParallelism());
 
 		// bounds configured parallelism 1
@@ -301,7 +302,7 @@ public class StreamExecutionEnvironmentTest {
 		Assert.assertEquals(1 << 15, operator.getTransformation().getMaxParallelism());
 
 		// override config
-		env.getStreamGraph().getJobGraph();
+		env.getStreamGraph().getJobGraph(JobID.generate());
 		Assert.assertEquals(1 << 15 , operator.getTransformation().getMaxParallelism());
 	}
 

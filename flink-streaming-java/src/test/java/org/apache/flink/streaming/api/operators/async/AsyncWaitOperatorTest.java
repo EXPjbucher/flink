@@ -19,6 +19,7 @@
 package org.apache.flink.streaming.api.operators.async;
 
 import org.apache.flink.api.common.ExecutionConfig;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.TaskInfo;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichMapFunction;
@@ -475,7 +476,7 @@ public class AsyncWaitOperatorTest extends TestLogger {
 		}).startNewChain().addSink(new DiscardingSink<Integer>());
 
 		// be build our own OperatorChain
-		final JobGraph jobGraph = chainEnv.getStreamGraph().getJobGraph();
+		final JobGraph jobGraph = chainEnv.getStreamGraph().getJobGraph(JobID.generate());
 
 		Assert.assertTrue(jobGraph.getVerticesSortedTopologicallyFromSources().size() == 3);
 

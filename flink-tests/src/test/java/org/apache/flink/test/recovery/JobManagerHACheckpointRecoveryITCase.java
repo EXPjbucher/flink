@@ -21,6 +21,7 @@ package org.apache.flink.test.recovery;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import org.apache.commons.io.FileUtils;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.akka.AkkaUtils;
@@ -160,7 +161,7 @@ public class JobManagerHACheckpointRecoveryITCase extends TestLogger {
 				.addSink(new CountingSink())
 				.setParallelism(1);
 
-		JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+		JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 
 		Configuration config = ZooKeeperTestUtils.createZooKeeperHAConfig(ZooKeeper
 				.getConnectString(), FileStateBackendBasePath.getAbsoluteFile().toURI().toString());

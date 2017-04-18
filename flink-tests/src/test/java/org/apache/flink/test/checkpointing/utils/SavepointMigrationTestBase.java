@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.JobSubmissionResult;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.client.program.StandaloneClusterClient;
@@ -114,7 +115,7 @@ public class SavepointMigrationTestBase extends TestBaseUtils {
 		ActorGateway jobManager = Await.result(cluster.leaderGateway().future(), DEADLINE.timeLeft());
 
 		// Submit the job
-		JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+		JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 
 
 		JobSubmissionResult jobSubmissionResult = cluster.submitJobDetached(jobGraph);
@@ -200,7 +201,7 @@ public class SavepointMigrationTestBase extends TestBaseUtils {
 		Await.result(cluster.leaderGateway().future(), DEADLINE.timeLeft());
 
 		// Submit the job
-		JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+		JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 
 		jobGraph.setSavepointRestoreSettings(SavepointRestoreSettings.forPath(savepointPath));
 

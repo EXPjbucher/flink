@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.runtime.jobgraph.JobVertex;
 import org.apache.flink.runtime.jobgraph.JobGraph;
@@ -64,7 +65,7 @@ public class SlotAllocationTest extends TestLogger {
 				.filter(dummyFilter).startNewChain()
 				.print().disableChaining();
 
-		JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+		JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 
 		List<JobVertex> vertices = jobGraph.getVerticesSortedTopologicallyFromSources();
 
@@ -104,7 +105,7 @@ public class SlotAllocationTest extends TestLogger {
 		// this should inherit "group-1" now
 		src3.union(src4).filter(dummyFilter);
 
-		JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+		JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 
 		List<JobVertex> vertices = jobGraph.getVerticesSortedTopologicallyFromSources();
 
@@ -135,7 +136,7 @@ public class SlotAllocationTest extends TestLogger {
 
 		// this should not inherit group but be in "default"
 		src1.union(src2).filter(dummyFilter).slotSharingGroup("default");
-		JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+		JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 
 		List<JobVertex> vertices = jobGraph.getVerticesSortedTopologicallyFromSources();
 
@@ -173,7 +174,7 @@ public class SlotAllocationTest extends TestLogger {
 		// this should inherit "group-1" now
 		src3.connect(src4).map(dummyCoMap);
 
-		JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+		JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 
 		List<JobVertex> vertices = jobGraph.getVerticesSortedTopologicallyFromSources();
 

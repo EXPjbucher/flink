@@ -20,6 +20,7 @@ package org.apache.flink.streaming.api.graph;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.api.common.ExecutionConfig;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.operators.ResourceSpec;
 import org.apache.flink.api.common.operators.util.UserCodeObjectWrapper;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
@@ -113,9 +114,9 @@ public class StreamingJobGraphGenerator {
 		this.physicalEdgesInOrder = new ArrayList<>();
 	}
 
-	public JobGraph createJobGraph() {
+	public JobGraph createJobGraph(JobID jobId) {
 
-		jobGraph = new JobGraph(streamGraph.getJobName());
+		jobGraph = new JobGraph(jobId, streamGraph.getJobName());
 
 		// make sure that all vertices start immediately
 		jobGraph.setScheduleMode(ScheduleMode.EAGER);

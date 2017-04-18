@@ -56,6 +56,9 @@ public class CliFrontendParser {
 			"The parallelism with which to run the program. Optional flag to override the default value " +
 			"specified in the configuration.");
 
+	public static final Option JOB_ID_OPTION = new Option("i", "jobid", true, "The JobID of the program to submit." +
+			"When used the program will be run under this JobID. This parameter is a guid.");
+
 	static final Option LOGGING_OPTION = new Option("q", "sysoutLogging", false, "If present, " +
 			"suppress logging output to standard out.");
 
@@ -180,6 +183,7 @@ public class CliFrontendParser {
 		options = getProgramSpecificOptions(options);
 		options.addOption(SAVEPOINT_PATH_OPTION);
 		options.addOption(SAVEPOINT_ALLOW_NON_RESTORED_OPTION);
+		options.addOption(JOB_ID_OPTION);
 
 		options = getJobManagerAddressOption(options);
 		return addCustomCliOptions(options, true);
@@ -230,6 +234,7 @@ public class CliFrontendParser {
 		Options o = getProgramSpecificOptionsWithoutDeprecatedOptions(options);
 		o.addOption(SAVEPOINT_PATH_OPTION);
 		o.addOption(SAVEPOINT_ALLOW_NON_RESTORED_OPTION);
+		o.addOption(JOB_ID_OPTION);
 
 		return getJobManagerAddressOption(o);
 	}

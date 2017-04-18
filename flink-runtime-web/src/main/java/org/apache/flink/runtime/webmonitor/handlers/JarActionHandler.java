@@ -20,6 +20,7 @@ package org.apache.flink.runtime.webmonitor.handlers;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.apache.flink.annotation.VisibleForTesting;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.client.program.ClusterClient;
 import org.apache.flink.client.program.PackagedProgram;
@@ -72,7 +73,7 @@ public abstract class JarActionHandler extends AbstractJsonRequestHandler {
 		FlinkPlan plan = ClusterClient.getOptimizedPlan(optimizer, program, config.getParallelism());
 
 		if (plan instanceof StreamingPlan) {
-			graph = ((StreamingPlan) plan).getJobGraph();
+			graph = ((StreamingPlan) plan).getJobGraph(JobID.generate());
 		} else if (plan instanceof OptimizedPlan) {
 			graph = new JobGraphGenerator().compileJobGraph((OptimizedPlan) plan);
 		}

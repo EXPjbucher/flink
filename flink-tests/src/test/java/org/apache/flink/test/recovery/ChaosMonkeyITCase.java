@@ -380,7 +380,7 @@ public class ChaosMonkeyITCase extends TestLogger {
 				.addSink(new CountingSink(parallelism, expectedResult))
 				.setParallelism(1);
 
-		return env.getStreamGraph().getJobGraph();
+		return env.getStreamGraph().getJobGraph(JobID.generate());
 	}
 
 	public static class CheckpointedSequenceSource extends RichParallelSourceFunction<Long>

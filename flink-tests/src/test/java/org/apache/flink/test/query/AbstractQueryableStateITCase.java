@@ -206,7 +206,7 @@ public abstract class AbstractQueryableStateITCase extends TestLogger {
 					}).asQueryableState(queryName, reducingState);
 
 			// Submit the job graph
-			JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+			JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 			cluster.submitJobDetached(jobGraph);
 
 			//
@@ -343,7 +343,7 @@ public abstract class AbstractQueryableStateITCase extends TestLogger {
 					}).asQueryableState(queryName);
 
 			// Submit the job graph
-			JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+			JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 			jobId = jobGraph.getJobID();
 
 			Future<JobStatusIs> failedFuture = cluster
@@ -425,7 +425,7 @@ public abstract class AbstractQueryableStateITCase extends TestLogger {
 					}).asQueryableState("hakuna", valueState);
 
 			// Submit the job graph
-			JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+			JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 			jobId = jobGraph.getJobID();
 
 			cluster.submitJobDetached(jobGraph);
@@ -491,7 +491,7 @@ public abstract class AbstractQueryableStateITCase extends TestLogger {
 				}).asQueryableState("hakuna", valueState);
 
 			// Submit the job graph
-			JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+			JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 			jobId = jobGraph.getJobID();
 
 			// Now query
@@ -624,7 +624,7 @@ public abstract class AbstractQueryableStateITCase extends TestLogger {
 					}).asQueryableState("hakuna", valueState);
 
 			// Submit the job graph
-			JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+			JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 			jobId = jobGraph.getJobID();
 
 			cluster.submitJobDetached(jobGraph);
@@ -704,7 +704,7 @@ public abstract class AbstractQueryableStateITCase extends TestLogger {
 					}).asQueryableState("matata");
 
 			// Submit the job graph
-			JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+			JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 			jobId = jobGraph.getJobID();
 
 			cluster.submitJobDetached(jobGraph);
@@ -775,7 +775,7 @@ public abstract class AbstractQueryableStateITCase extends TestLogger {
 					}).asQueryableState("pumba", foldingState);
 
 			// Submit the job graph
-			JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+			JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 			jobId = jobGraph.getJobID();
 
 			cluster.submitJobDetached(jobGraph);
@@ -875,7 +875,7 @@ public abstract class AbstractQueryableStateITCase extends TestLogger {
 					}).asQueryableState("jungle", reducingState);
 
 			// Submit the job graph
-			JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+			JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 			jobId = jobGraph.getJobID();
 
 			cluster.submitJobDetached(jobGraph);

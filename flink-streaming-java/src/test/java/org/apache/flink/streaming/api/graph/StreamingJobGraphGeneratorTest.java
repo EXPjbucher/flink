@@ -17,6 +17,7 @@
 
 package org.apache.flink.streaming.api.graph;
 
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -92,7 +93,7 @@ public class StreamingJobGraphGeneratorTest extends TestLogger {
 
 		StreamGraph streamGraph = env.getStreamGraph();
 		streamGraph.setJobName("test job");
-		JobGraph jobGraph = streamGraph.getJobGraph();
+		JobGraph jobGraph = streamGraph.getJobGraph(JobID.generate());
 		List<JobVertex> verticesSorted = jobGraph.getVerticesSortedTopologicallyFromSources();
 		
 		assertEquals(2, jobGraph.getNumberOfVertices());
@@ -116,7 +117,7 @@ public class StreamingJobGraphGeneratorTest extends TestLogger {
 		assertFalse("Checkpointing enabled", streamGraph.getCheckpointConfig().isCheckpointingEnabled());
 
 		StreamingJobGraphGenerator jobGraphGenerator = new StreamingJobGraphGenerator(streamGraph, 1 /* default parallelism */);
-		JobGraph jobGraph = jobGraphGenerator.createJobGraph();
+		JobGraph jobGraph = jobGraphGenerator.createJobGraph(JobID.generate());
 
 		JobSnapshottingSettings snapshottingSettings = jobGraph.getSnapshotSettings();
 		assertEquals(Long.MAX_VALUE, snapshottingSettings.getCheckpointInterval());
@@ -137,7 +138,7 @@ public class StreamingJobGraphGeneratorTest extends TestLogger {
 				}
 			})
 			.print();
-		JobGraph jobGraph = new StreamingJobGraphGenerator(env.getStreamGraph(), 1 /* default parallelism */).createJobGraph();
+		JobGraph jobGraph = new StreamingJobGraphGenerator(env.getStreamGraph(), 1 /* default parallelism */).createJobGraph(JobID.generate());
 
 		List<JobVertex> verticesSorted = jobGraph.getVerticesSortedTopologicallyFromSources();
 		JobVertex sourceVertex = verticesSorted.get(0);
@@ -224,7 +225,7 @@ public class StreamingJobGraphGeneratorTest extends TestLogger {
 		});
 		sinkMethod.invoke(sink, resource5);
 
-		JobGraph jobGraph = new StreamingJobGraphGenerator(env.getStreamGraph(), 1 /* default parallelism */).createJobGraph();
+		JobGraph jobGraph = new StreamingJobGraphGenerator(env.getStreamGraph(), 1 /* default parallelism */).createJobGraph(JobID.generate());
 
 		JobVertex sourceMapFilterVertex = jobGraph.getVerticesSortedTopologicallyFromSources().get(0);
 		JobVertex reduceSinkVertex = jobGraph.getVerticesSortedTopologicallyFromSources().get(1);
@@ -291,7 +292,7 @@ public class StreamingJobGraphGeneratorTest extends TestLogger {
 		}).disableChaining().name("test_sink");
 		sinkMethod.invoke(sink, resource5);
 
-		JobGraph jobGraph = new StreamingJobGraphGenerator(env.getStreamGraph(), 1 /* default parallelism */).createJobGraph();
+		JobGraph jobGraph = new StreamingJobGraphGenerator(env.getStreamGraph(), 1 /* default parallelism */).createJobGraph(JobID.generate());
 
 		for (JobVertex jobVertex : jobGraph.getVertices()) {
 			if (jobVertex.getName().contains("test_source")) {

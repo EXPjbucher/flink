@@ -20,6 +20,7 @@ package org.apache.flink.streaming.api.environment;
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.api.common.InvalidProgramException;
 import org.apache.flink.api.common.JobExecutionResult;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.configuration.Configuration;
@@ -93,7 +94,7 @@ public class Flip6LocalStreamEnvironment extends StreamExecutionEnvironment {
 		// TODO - temp fix to enforce restarts due to a bug in the allocation protocol
 		streamGraph.getExecutionConfig().setRestartStrategy(RestartStrategies.fixedDelayRestart(Integer.MAX_VALUE, 5));
 
-		JobGraph jobGraph = streamGraph.getJobGraph();
+		JobGraph jobGraph = streamGraph.getJobGraph(JobID.generate());
 		jobGraph.setAllowQueuedScheduling(true);
 
 		Configuration configuration = new Configuration();

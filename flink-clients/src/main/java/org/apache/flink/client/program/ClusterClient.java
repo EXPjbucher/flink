@@ -295,6 +295,12 @@ public abstract class ClusterClient {
 	//  Program submission / execution
 	// ------------------------------------------------------------------------
 
+
+	public JobSubmissionResult run(PackagedProgram prog, int parallelism) throws ProgramInvocationException, ProgramMissingJobException {
+		return run(prog, parallelism, JobID.generate());
+	}
+
+
 	/**
 	 * General purpose method to run a user jar from the CliFrontend in either blocking or detached mode, depending
 	 * on whether {@code setDetached(true)} or {@code setDetached(false)}.
@@ -304,7 +310,7 @@ public abstract class ClusterClient {
 	 * @throws ProgramMissingJobException
 	 * @throws ProgramInvocationException
 	 */
-	public JobSubmissionResult run(PackagedProgram prog, int parallelism)
+	public JobSubmissionResult run(PackagedProgram prog, int parallelism, JobID jobId)
 			throws ProgramInvocationException, ProgramMissingJobException
 	{
 		Thread.currentThread().setContextClassLoader(prog.getUserCodeClassLoader());
@@ -317,7 +323,7 @@ public abstract class ClusterClient {
 				jobWithJars = prog.getPlanWithJars();
 			}
 
-			return run(jobWithJars, parallelism, prog.getSavepointSettings());
+			return run(jobWithJars, parallelism, prog.getSavepointSettings(), jobId);
 		}
 		else if (prog.isUsingInteractiveMode()) {
 			LOG.info("Starting program in interactive mode");
@@ -342,7 +348,7 @@ public abstract class ClusterClient {
 				}
 				if (isDetached()) {
 					// in detached mode, we execute the whole user code to extract the Flink job, afterwards we run it here
-					return ((DetachedEnvironment) factory.getLastEnvCreated()).finalizeExecute();
+					return ((DetachedEnvironment) factory.getLastEnvCreated()).finalizeExecute(jobId);
 				}
 				else {
 					// in blocking mode, we execute all Flink jobs contained in the user code and then return here
@@ -359,7 +365,11 @@ public abstract class ClusterClient {
 	}
 
 	public JobSubmissionResult run(JobWithJars program, int parallelism) throws ProgramInvocationException {
-		return run(program, parallelism, SavepointRestoreSettings.none());
+		return run(program, parallelism, JobID.generate());
+	}
+
+	public JobSubmissionResult run(JobWithJars program, int parallelism, JobID jobId) throws ProgramInvocationException {
+		return run(program, parallelism, SavepointRestoreSettings.none(), jobId);
 	}
 
 	/**
@@ -376,7 +386,7 @@ public abstract class ClusterClient {
 	 *                                    i.e. the job-manager is unreachable, or due to the fact that the
 	 *                                    parallel execution failed.
 	 */
-	public JobSubmissionResult run(JobWithJars jobWithJars, int parallelism, SavepointRestoreSettings savepointSettings)
+	public JobSubmissionResult run(JobWithJars jobWithJars, int parallelism, SavepointRestoreSettings savepointSettings, JobID jobId)
 			throws CompilerException, ProgramInvocationException {
 		ClassLoader classLoader = jobWithJars.getUserCodeClassLoader();
 		if (classLoader == null) {
@@ -384,19 +394,19 @@ public abstract class ClusterClient {
 		}
 
 		OptimizedPlan optPlan = getOptimizedPlan(compiler, jobWithJars, parallelism);
-		return run(optPlan, jobWithJars.getJarFiles(), jobWithJars.getClasspaths(), classLoader, savepointSettings);
+		return run(optPlan, jobWithJars.getJarFiles(), jobWithJars.getClasspaths(), classLoader, savepointSettings, jobId);
 	}
 
 	public JobSubmissionResult run(
-			FlinkPlan compiledPlan, List<URL> libraries, List<URL> classpaths, ClassLoader classLoader) throws ProgramInvocationException {
-		return run(compiledPlan, libraries, classpaths, classLoader, SavepointRestoreSettings.none());
+			FlinkPlan compiledPlan, List<URL> libraries, List<URL> classpaths, ClassLoader classLoader, JobID jobId) throws ProgramInvocationException {
+		return run(compiledPlan, libraries, classpaths, classLoader, SavepointRestoreSettings.none(), jobId);
 	}
 
 	public JobSubmissionResult run(FlinkPlan compiledPlan,
-			List<URL> libraries, List<URL> classpaths, ClassLoader classLoader, SavepointRestoreSettings savepointSettings)
+			List<URL> libraries, List<URL> classpaths, ClassLoader classLoader, SavepointRestoreSettings savepointSettings, JobID jobId)
 		throws ProgramInvocationException
 	{
-		JobGraph job = getJobGraph(compiledPlan, libraries, classpaths, savepointSettings);
+		JobGraph job = getJobGraph(compiledPlan, libraries, classpaths, savepointSettings, jobId);
 		return submitJob(job, classLoader);
 	}
 
@@ -653,13 +663,17 @@ public abstract class ClusterClient {
 	}
 
 	private JobGraph getJobGraph(FlinkPlan optPlan, List<URL> jarFiles, List<URL> classpaths, SavepointRestoreSettings savepointSettings) {
+		return getJobGraph(optPlan, jarFiles, classpaths, savepointSettings, null);
+	}
+
+	private JobGraph getJobGraph(FlinkPlan optPlan, List<URL> jarFiles, List<URL> classpaths, SavepointRestoreSettings savepointSettings, JobID jobID) {
 		JobGraph job;
 		if (optPlan instanceof StreamingPlan) {
-			job = ((StreamingPlan) optPlan).getJobGraph();
+			job = ((StreamingPlan) optPlan).getJobGraph(jobID);
 			job.setSavepointRestoreSettings(savepointSettings);
 		} else {
 			JobGraphGenerator gen = new JobGraphGenerator(this.flinkConfig);
-			job = gen.compileJobGraph((OptimizedPlan) optPlan);
+			job = gen.compileJobGraph((OptimizedPlan) optPlan, jobID);
 		}
 
 		for (URL jar : jarFiles) {

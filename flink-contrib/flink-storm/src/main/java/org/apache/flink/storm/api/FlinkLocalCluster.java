@@ -18,6 +18,7 @@
 
 package org.apache.flink.storm.api;
 
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.configuration.TaskManagerOptions;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.generated.ClusterSummary;
@@ -87,7 +88,7 @@ public class FlinkLocalCluster {
 		StreamGraph streamGraph = topology.getExecutionEnvironment().getStreamGraph();
 		streamGraph.setJobName(topologyName);
 
-		JobGraph jobGraph = streamGraph.getJobGraph();
+		JobGraph jobGraph = streamGraph.getJobGraph(JobID.generate());
 
 		if (this.flink == null) {
 			Configuration configuration = new Configuration();

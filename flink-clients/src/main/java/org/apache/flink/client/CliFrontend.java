@@ -198,7 +198,7 @@ public class CliFrontend {
 
 	/**
 	 * Executions the run action.
-	 * 
+	 *
 	 * @param args Command line arguments for the run action.
 	 */
 	protected int run(String[] args) {
@@ -256,7 +256,7 @@ public class CliFrontend {
 				userParallelism = client.getMaxSlots();
 			}
 
-			return executeProgram(program, client, userParallelism);
+			return executeProgram(program, client, userParallelism, options.getJobID());
 		}
 		catch (Throwable t) {
 			return handleError(t);
@@ -826,12 +826,13 @@ public class CliFrontend {
 	//  Interaction with programs and JobManager
 	// --------------------------------------------------------------------------------------------
 
-	protected int executeProgram(PackagedProgram program, ClusterClient client, int parallelism) {
+	protected int executeProgram(PackagedProgram program, ClusterClient client, int parallelism, JobID jobId) {
 		logAndSysout("Starting execution of program");
 
 		JobSubmissionResult result;
 		try {
-			result = client.run(program, parallelism);
+			// TODO: Come back to me!
+			result = client.run(program, parallelism, jobId);
 		} catch (ProgramParametrizationException e) {
 			return handleParametrizationException(e);
 		} catch (ProgramMissingJobException e) {

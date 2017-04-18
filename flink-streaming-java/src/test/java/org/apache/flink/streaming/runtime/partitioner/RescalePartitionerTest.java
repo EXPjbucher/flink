@@ -122,7 +122,7 @@ public class RescalePartitionerTest extends TestLogger {
 
 		counts.rescale().print().setParallelism(2);
 
-		JobGraph jobGraph = env.getStreamGraph().getJobGraph();
+		JobGraph jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 
 		final JobID jobId = new JobID();
 		final String jobName = "Semi-Rebalance Test Job";

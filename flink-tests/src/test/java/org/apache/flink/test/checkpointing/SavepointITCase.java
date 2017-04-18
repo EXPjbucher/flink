@@ -531,7 +531,7 @@ public class SavepointITCase extends TestLogger {
 					})
 					.addSink(new DiscardingSink<Integer>());
 
-			JobGraph originalJobGraph = env.getStreamGraph().getJobGraph();
+			JobGraph originalJobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 
 			JobSubmissionResult submissionResult = flink.submitJobDetached(originalJobGraph);
 			JobID jobID = submissionResult.getJobID();
@@ -586,7 +586,7 @@ public class SavepointITCase extends TestLogger {
 					})
 					.addSink(new DiscardingSink<Integer>());
 
-			JobGraph modifiedJobGraph = env.getStreamGraph().getJobGraph();
+			JobGraph modifiedJobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 
 			// Set the savepoint path
 			modifiedJobGraph.setSavepointRestoreSettings(SavepointRestoreSettings.forPath(savepointPath));
@@ -632,7 +632,7 @@ public class SavepointITCase extends TestLogger {
 
 		stream.addSink(new DiscardingSink<Integer>());
 
-		return env.getStreamGraph().getJobGraph();
+		return env.getStreamGraph().getJobGraph(JobID.generate());
 	}
 
 	private static class InfiniteTestSource implements SourceFunction<Integer> {
@@ -780,7 +780,7 @@ public class SavepointITCase extends TestLogger {
 		StreamGraph streamGraph = env.getStreamGraph();
 		streamGraph.setJobName("Test");
 
-		JobGraph jobGraph = streamGraph.getJobGraph();
+		JobGraph jobGraph = streamGraph.getJobGraph(JobID.generate());
 
 		Configuration config = new Configuration();
 		config.addAll(jobGraph.getJobConfiguration());
@@ -812,7 +812,7 @@ public class SavepointITCase extends TestLogger {
 			savepointPath = cluster.triggerSavepoint(jobGraph.getJobID());
 			source.cancel();
 
-			jobGraph = streamGraph.getJobGraph();
+			jobGraph = streamGraph.getJobGraph(JobID.generate());
 			jobGraph.setSavepointRestoreSettings(SavepointRestoreSettings.forPath(savepointPath));
 
 			cluster.submitJobDetached(jobGraph);

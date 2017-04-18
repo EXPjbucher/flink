@@ -20,6 +20,7 @@ package org.apache.flink.streaming.api.environment;
 import org.apache.flink.annotation.Public;
 import org.apache.flink.api.common.InvalidProgramException;
 import org.apache.flink.api.common.JobExecutionResult;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
@@ -109,7 +110,7 @@ public class LocalStreamEnvironment extends StreamExecutionEnvironment {
 		StreamGraph streamGraph = getStreamGraph();
 		streamGraph.setJobName(jobName);
 
-		JobGraph jobGraph = streamGraph.getJobGraph();
+		JobGraph jobGraph = streamGraph.getJobGraph(JobID.generate());
 
 		Configuration configuration = new Configuration();
 		configuration.addAll(jobGraph.getJobConfiguration());

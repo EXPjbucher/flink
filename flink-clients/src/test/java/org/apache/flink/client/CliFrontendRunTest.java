@@ -19,6 +19,7 @@
 
 package org.apache.flink.client;
 
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.client.cli.CliFrontendParser;
 import org.apache.flink.client.cli.RunOptions;
 import org.apache.flink.client.program.ClusterClient;
@@ -149,7 +150,7 @@ public class CliFrontendRunTest {
 		}
 
 		@Override
-		protected int executeProgram(PackagedProgram program, ClusterClient client, int parallelism) {
+		protected int executeProgram(PackagedProgram program, ClusterClient client, int parallelism, JobID jobId) {
 			assertEquals(isDetached, client.isDetached());
 			assertEquals(sysoutLogging, client.getPrintStatusDuringExecution());
 			assertEquals(expectedParallelism, parallelism);

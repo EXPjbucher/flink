@@ -19,6 +19,7 @@ package org.apache.flink.client.cli;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.flink.api.common.ExecutionConfig;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.runtime.jobgraph.SavepointRestoreSettings;
 
 import java.net.MalformedURLException;
@@ -26,21 +27,25 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.apache.flink.client.cli.CliFrontendParser.ARGS_OPTION;
+import static org.apache.flink.client.cli.CliFrontendParser.JOB_ID_OPTION;
+import static org.apache.flink.client.cli.CliFrontendParser.JAR_OPTION;
 import static org.apache.flink.client.cli.CliFrontendParser.CLASSPATH_OPTION;
 import static org.apache.flink.client.cli.CliFrontendParser.CLASS_OPTION;
-import static org.apache.flink.client.cli.CliFrontendParser.DETACHED_OPTION;
-import static org.apache.flink.client.cli.CliFrontendParser.JAR_OPTION;
-import static org.apache.flink.client.cli.CliFrontendParser.LOGGING_OPTION;
 import static org.apache.flink.client.cli.CliFrontendParser.PARALLELISM_OPTION;
-import static org.apache.flink.client.cli.CliFrontendParser.SAVEPOINT_ALLOW_NON_RESTORED_OPTION;
+import static org.apache.flink.client.cli.CliFrontendParser.LOGGING_OPTION;
+import static org.apache.flink.client.cli.CliFrontendParser.DETACHED_OPTION;
 import static org.apache.flink.client.cli.CliFrontendParser.SAVEPOINT_PATH_OPTION;
+import static org.apache.flink.client.cli.CliFrontendParser.SAVEPOINT_ALLOW_NON_RESTORED_OPTION;
 
 /**
  * Base class for command line options that refer to a JAR file program.
  */
 public abstract class ProgramOptions extends CommandLineOptions {
+
+	private final JobID jobID;
 
 	private final String jarFilePath;
 
@@ -119,6 +124,14 @@ public abstract class ProgramOptions extends CommandLineOptions {
 		} else {
 			this.savepointSettings = SavepointRestoreSettings.none();
 		}
+
+		if (line.hasOption(JOB_ID_OPTION.getOpt())) {
+			String jobIdRaw = line.getOptionValue(JOB_ID_OPTION.getOpt());
+			UUID id = UUID.fromString(jobIdRaw);
+			this.jobID = JobID.fromHexString(id.toString().replace("-", ""));
+		} else {
+			this.jobID = JobID.generate();
+		}
 	}
 
 	public String getJarFilePath() {
@@ -151,5 +164,9 @@ public abstract class ProgramOptions extends CommandLineOptions {
 
 	public SavepointRestoreSettings getSavepointRestoreSettings() {
 		return savepointSettings;
+	}
+
+	public JobID getJobID() {
+		return jobID;
 	}
 }

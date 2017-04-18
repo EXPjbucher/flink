@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.api.common.ExecutionConfig;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.api.common.io.InputFormat;
 import org.apache.flink.util.OutputTag;
 import org.apache.flink.api.common.operators.ResourceSpec;
@@ -648,7 +649,7 @@ public class StreamGraph extends StreamingPlan {
 	 * Gets the assembled {@link JobGraph}.
 	 */
 	@SuppressWarnings("deprecation")
-	public JobGraph getJobGraph() {
+	public JobGraph getJobGraph(JobID jobId) {
 		// temporarily forbid checkpointing for iterative jobs
 		if (isIterative() && checkpointConfig.isCheckpointingEnabled() && !checkpointConfig.isForceCheckpointing()) {
 			throw new UnsupportedOperationException(
@@ -659,7 +660,7 @@ public class StreamGraph extends StreamingPlan {
 
 		StreamingJobGraphGenerator jobgraphGenerator = new StreamingJobGraphGenerator(this, defaultParallelism);
 
-		return jobgraphGenerator.createJobGraph();
+		return jobgraphGenerator.createJobGraph(jobId);
 	}
 
 	@Override

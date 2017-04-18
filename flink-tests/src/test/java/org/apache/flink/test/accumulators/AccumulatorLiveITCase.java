@@ -174,7 +174,7 @@ public class AccumulatorLiveITCase {
 				.writeUsingOutputFormat(new NotifyingOutputFormat()).disableChaining();
 
 
-		jobGraph = env.getStreamGraph().getJobGraph();
+		jobGraph = env.getStreamGraph().getJobGraph(JobID.generate());
 		jobID = jobGraph.getJobID();
 
 		verifyResults();

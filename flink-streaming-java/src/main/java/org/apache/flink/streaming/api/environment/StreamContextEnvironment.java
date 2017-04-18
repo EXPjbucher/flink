@@ -19,6 +19,7 @@ package org.apache.flink.streaming.api.environment;
 
 import org.apache.flink.annotation.PublicEvolving;
 import org.apache.flink.api.common.JobExecutionResult;
+import org.apache.flink.api.common.JobID;
 import org.apache.flink.client.program.ContextEnvironment;
 import org.apache.flink.client.program.DetachedEnvironment;
 
@@ -64,7 +65,7 @@ public class StreamContextEnvironment extends StreamExecutionEnvironment {
 		} else {
 			return ctx
 				.getClient()
-				.run(streamGraph, ctx.getJars(), ctx.getClasspaths(), ctx.getUserCodeClassLoader(), ctx.getSavepointRestoreSettings())
+				.run(streamGraph, ctx.getJars(), ctx.getClasspaths(), ctx.getUserCodeClassLoader(), ctx.getSavepointRestoreSettings(), JobID.generate())
 				.getJobExecutionResult();
 		}
 	}
