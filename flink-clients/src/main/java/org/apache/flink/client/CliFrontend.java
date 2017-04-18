@@ -197,8 +197,7 @@ public class CliFrontend {
 	// --------------------------------------------------------------------------------------------
 
 	/**
-	 * Executions the run action.
-	 *
+	 * Executes the run action.
 	 * @param args Command line arguments for the run action.
 	 */
 	protected int run(String[] args) {
@@ -831,7 +830,6 @@ public class CliFrontend {
 
 		JobSubmissionResult result;
 		try {
-			// TODO: Come back to me!
 			result = client.run(program, parallelism, jobId);
 		} catch (ProgramParametrizationException e) {
 			return handleParametrizationException(e);

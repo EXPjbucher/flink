@@ -843,6 +843,44 @@ class JobManagerITCase(_system: ActorSystem)
           jobManager.tell(SubmitJob(jobGraph, ListeningBehaviour.DETACHED), testActor)
           expectMsg(JobSubmitSuccess(jobGraph.getJobID()))
 
+          jobManager.tell(SubmitJob(jobGraph, ListeningBehaviour.DETACHED), testActor)
+          expectMsg(JobAlreadyExists(jobGraph.getJobID))
+        }
+      }
+      finally {
+        flinkCluster.stop()
+      }
+    }
+
+    "handle job a job submitted twice with the same id" in {
+      val deadline = TestingUtils.TESTING_DURATION.fromNow
+
+      val flinkCluster = TestingUtils.startTestingCluster(1, 1)
+
+      try {
+        within(deadline.timeLeft) {
+          val jobManager = flinkCluster
+            .getLeaderGateway(deadline.timeLeft)
+
+          val jobVertex = new JobVertex("Blocking vertex")
+          jobVertex.setInvokableClass(classOf[BlockingNoOpInvokable])
+          val jobGraph = new JobGraph(jobVertex)
+          jobGraph.setSnapshotSettings(new JobSnapshottingSettings(
+            java.util.Collections.emptyList(),
+            java.util.Collections.emptyList(),
+            java.util.Collections.emptyList(),
+            60000,
+            60000,
+            60000,
+            1,
+            ExternalizedCheckpointSettings.none,
+            null,
+            true))
+
+          // Submit job...
+          jobManager.tell(SubmitJob(jobGraph, ListeningBehaviour.DETACHED), testActor)
+          expectMsg(JobSubmitSuccess(jobGraph.getJobID()))
+
           // Request the execution graph and set a checkpoint coordinator mock
           jobManager.tell(RequestExecutionGraph(jobGraph.getJobID), testActor)
           val executionGraph = expectMsgType[ExecutionGraphFound](

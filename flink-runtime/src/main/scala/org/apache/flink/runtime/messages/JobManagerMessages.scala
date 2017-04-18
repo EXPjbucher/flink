@@ -262,6 +262,12 @@ object JobManagerMessages {
   case class JobSubmitSuccess(jobId: JobID)
 
   /**
+    * Denotes a job submission where a job with the same JobID already exists.
+    * @param jobId The submitted job's ID.
+    */
+  case class JobAlreadyExists(jobId: JobID)
+
+  /**
     * Denotes a successful registration of a JobClientActor for a running job
     * @param jobId The job id of the registered job
     */

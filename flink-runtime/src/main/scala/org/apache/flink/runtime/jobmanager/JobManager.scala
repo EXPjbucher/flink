@@ -473,8 +473,13 @@ class JobManager(
 
       val jobInfo = new JobInfo(client, listeningBehaviour, System.currentTimeMillis(),
         jobGraph.getSessionTimeout)
-
-      submitJob(jobGraph, jobInfo)
+      val jobID = jobGraph.getJobID
+      if (!currentJobs.contains(jobID)) {
+        submitJob(jobGraph, jobInfo)
+      } else {
+        log.info(s"Ignoring job submission for job $jobID. This job is currently already running")
+        jobInfo.notifyClients(decorateMessage(JobAlreadyExists(jobID)))
+      }
 
     case RegisterJobClient(jobID, listeningBehaviour) =>
       val client = sender()

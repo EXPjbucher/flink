@@ -17,8 +17,9 @@
  */
 package org.apache.flink.streaming.api.scala
 
+import org.apache.flink.api.common.JobID
 import org.apache.flink.api.common.functions.FilterFunction
-import org.apache.flink.runtime.jobgraph.{JobVertex, JobGraph}
+import org.apache.flink.runtime.jobgraph.{JobGraph, JobVertex}
 import org.junit.Assert._
 import org.junit.Test
 
@@ -57,7 +58,7 @@ class SlotAllocationTest {
       .startNewChain()
       .print().disableChaining()
 
-    val jobGraph: JobGraph = env.getStreamGraph.getJobGraph
+    val jobGraph: JobGraph = env.getStreamGraph.getJobGraph(JobID.generate())
 
     val vertices = jobGraph.getVerticesSortedTopologicallyFromSources
 
