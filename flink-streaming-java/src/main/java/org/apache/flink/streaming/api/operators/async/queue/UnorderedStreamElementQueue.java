@@ -144,9 +144,11 @@ public class UnorderedStreamElementQueue implements StreamElementQueue {
 
 		try {
 			while (completedQueue.isEmpty()) {
+				// Can't Hold the lock here
+				lock.unlock();
 				hasCompletedEntries.await();
 			}
-
+			lock.lockInterruptibly();
 			LOG.debug("Peeked head element from ordered stream element queue with filling degree " +
 				"({}/{}).", numberEntries, capacity);
 
