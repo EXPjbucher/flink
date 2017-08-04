@@ -20,6 +20,7 @@ package org.apache.flink.streaming.api.operators.async.queue;
 
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.runtime.concurrent.AcceptFunction;
+import org.apache.flink.runtime.concurrent.ApplyFunction;
 import org.apache.flink.runtime.concurrent.Future;
 import org.apache.flink.streaming.runtime.streamrecord.StreamElement;
 import org.apache.flink.util.Preconditions;
@@ -64,15 +65,18 @@ public abstract class StreamElementQueueEntry<T> implements AsyncResult {
 	 */
 	public void onComplete(
 			final AcceptFunction<StreamElementQueueEntry<T>> completeFunction,
+			final ApplyFunction<Throwable, Object> handleErrorFunction,
 			Executor executor) {
 		final StreamElementQueueEntry<T> thisReference = this;
 
-		getFuture().thenAcceptAsync(new AcceptFunction<T>() {
+		getFuture()
+						.thenAcceptAsync(new AcceptFunction<T>() {
 			@Override
 			public void accept(T value) {
 				completeFunction.accept(thisReference);
 			}
-		}, executor);
+		}, executor)
+						.exceptionally(handleErrorFunction);
 	}
 
 	protected abstract Future<T> getFuture();

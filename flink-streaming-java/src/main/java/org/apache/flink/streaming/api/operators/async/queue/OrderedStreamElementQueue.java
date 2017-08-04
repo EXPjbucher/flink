@@ -20,6 +20,7 @@ package org.apache.flink.streaming.api.operators.async.queue;
 
 import org.apache.flink.annotation.Internal;
 import org.apache.flink.runtime.concurrent.AcceptFunction;
+import org.apache.flink.runtime.concurrent.ApplyFunction;
 import org.apache.flink.streaming.api.operators.async.OperatorActions;
 import org.apache.flink.util.Preconditions;
 import org.slf4j.Logger;
@@ -187,26 +188,39 @@ public class OrderedStreamElementQueue implements StreamElementQueue {
 	 * @param streamElementQueueEntry to be inserted
 	 * @param <T> Type of the stream element queue entry's result
 	 */
-	private <T> void addEntry(StreamElementQueueEntry<T> streamElementQueueEntry) {
+	private <T> void addEntry(final StreamElementQueueEntry<T> streamElementQueueEntry) {
 		assert(lock.isHeldByCurrentThread());
 
 		queue.addLast(streamElementQueueEntry);
 
 		streamElementQueueEntry.onComplete(new AcceptFunction<StreamElementQueueEntry<T>>() {
-			@Override
-			public void accept(StreamElementQueueEntry<T> value) {
-				try {
-					onCompleteHandler(value);
-				} catch (InterruptedException e) {
-					// we got interrupted. This indicates a shutdown of the executor
-					LOG.debug("AsyncBufferEntry could not be properly completed because the " +
-						"executor thread has been interrupted.", e);
-				} catch (Throwable t) {
-					operatorActions.failOperator(new Exception("Could not complete the " +
-						"stream element queue entry: " + value + '.', t));
-				}
-			}
-		}, executor);
+																				 @Override
+																				 public void accept(StreamElementQueueEntry<T> value) {
+																					 try {
+																						 onCompleteHandler(value);
+																					 } catch (InterruptedException e) {
+																						 // we got interrupted. This indicates a shutdown of the executor
+																						 LOG.debug("AsyncBufferEntry could not be properly completed because the " +
+																										 "executor thread has been interrupted.", e);
+																					 } catch (Throwable t) {
+																						 operatorActions.failOperator(new Exception("Could not complete the " +
+																										 "stream element queue entry: " + value + '.', t));
+																					 }
+																				 }
+																			 },
+						new ApplyFunction<Throwable, Object>() {
+							@Override
+							public Object apply(Throwable value) {
+								LOG.error("Got an exception from future execution", value);
+								try {
+									onCompleteHandler(streamElementQueueEntry);
+								} catch (InterruptedException e) {
+									LOG.error("Got Interrupted Exception");
+								}
+								return null;
+							}
+						},
+						executor);
 	}
 
 	/**

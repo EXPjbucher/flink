@@ -23,6 +23,7 @@ import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.api.common.state.ListStateDescriptor;
 import org.apache.flink.api.common.typeutils.TypeSerializer;
 import org.apache.flink.runtime.concurrent.AcceptFunction;
+import org.apache.flink.runtime.concurrent.ApplyFunction;
 import org.apache.flink.runtime.state.StateInitializationContext;
 import org.apache.flink.runtime.state.StateSnapshotContext;
 import org.apache.flink.streaming.api.datastream.AsyncDataStream;
@@ -210,6 +211,7 @@ public class AsyncWaitOperator<IN, OUT>
 				new ProcessingTimeCallback() {
 					@Override
 					public void onProcessingTime(long timestamp) throws Exception {
+						LOG.debug("Timeout from processElement.");
 						streamRecordBufferEntry.collect(
 							new TimeoutException("Async function call has timed out."));
 					}
@@ -220,9 +222,18 @@ public class AsyncWaitOperator<IN, OUT>
 			streamRecordBufferEntry.onComplete(new AcceptFunction<StreamElementQueueEntry<Collection<OUT>>>() {
 				@Override
 				public void accept(StreamElementQueueEntry<Collection<OUT>> value) {
+					LOG.debug("Canceling the Timeout from processElement.");
 					timerFuture.cancel(true);
 				}
-			}, executor);
+			},
+			new ApplyFunction<Throwable, Object>() {
+				@Override
+				public Object apply(Throwable value) {
+					// TODO: Figure out the appropriate action here (Probably do nothing)
+					return null;
+				}
+			}
+			, executor);
 		}
 
 		addAsyncBufferEntry(streamRecordBufferEntry);
